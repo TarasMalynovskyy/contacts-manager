@@ -16,14 +16,14 @@ class ShowAllCommand implements Command {
 		final int loginedUserId = IdUserSetter.getUserIdLogined();
 
 		List<Person> listOfPersons = list.showAll(loginedUserId);
-		
+
 		for (Person p : listOfPersons) {
 			System.out.println(p);
 		}
 
 		System.out.println("You have " + listOfPersons.size() + " persons in your list");
 		System.out.println();
-		
+
 		return true;
 	}
 

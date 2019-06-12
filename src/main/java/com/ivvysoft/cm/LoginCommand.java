@@ -29,12 +29,13 @@ public class LoginCommand implements Command {
 				return true;
 			} else {
 				System.out.println("Password is wrong!");
-				return false;
+				execute(scan);
 			}
 		} else {
 			System.out.println("Username is wrong!");
-			return false;
+			execute(scan);
 		}
+		return true;
 	}
 
 	@Override

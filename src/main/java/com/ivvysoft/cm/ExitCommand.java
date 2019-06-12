@@ -5,12 +5,6 @@ import java.util.Scanner;
 
 class ExitCommand implements Command {
 
-	private final UsersRepository listAnonim;
-
-	public ExitCommand(final UsersRepository listAnonim) {
-		this.listAnonim = listAnonim;
-	}
-
 	public boolean execute(final Scanner scan) throws SQLException {
 		return false;
 	}

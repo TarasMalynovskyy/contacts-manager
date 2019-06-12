@@ -1,57 +1,52 @@
 package com.ivvysoft.cm;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
 
 public class UsersRepository {
 
 	public void addNew(final User user) throws SQLException {
 		final String SQL = "INSERT INTO users (user_name, password) VALUES (?,?)";
-		final Connection conn = DataBaseConnection.getInstance().getConnection();
-		final PreparedStatement prstmt = conn.prepareStatement(SQL);
-
+		PreparedStatement prstmt = null;
 		try {
+			prstmt = DataBaseConnection.getInstance().getConnection().prepareStatement(SQL);
 			prstmt.setString(1, user.getUserName());
 			prstmt.setString(2, user.getPassword());
 			prstmt.executeUpdate();
 
-		} catch (SQLIntegrityConstraintViolationException e) {
-			System.out.println();
-			System.out.println("User name already exist, please try another!");
-			System.out.println();
+		} finally {
+			if (prstmt != null) {
+				prstmt.close();
+			}
 		}
-
-		conn.close();
-		prstmt.close();
 	}
 
 	public User getUserByUsername(final String userName) throws SQLException {
-		final Connection conn = DataBaseConnection.getInstance().getConnection();
-		final String SQL = "SELECT * FROM users WHERE user_name = '" + userName + "'";
-		final Statement stmt = conn.createStatement();
-		final ResultSet rs = stmt.executeQuery(SQL);
+		final String SQL = "SELECT * FROM users WHERE user_name = ?";
+		PreparedStatement prstmt = null;
+		ResultSet rs = null;
+		try {
+			prstmt = DataBaseConnection.getInstance().getConnection().prepareStatement(SQL);
+			prstmt.setString(1, userName);
+			rs = prstmt.executeQuery();
 
-		while (rs.next()) {
-			final User user = new User();
-			user.setId(rs.getInt("id"));
-			user.setUserName(rs.getString("user_name"));
-			user.setPassword(rs.getString("password"));
-
+			User user = null;
+			while (rs.next()) {
+				user = new User();
+				user.setId(rs.getInt("id"));
+				user.setUserName(rs.getString("user_name"));
+				user.setPassword(rs.getString("password"));
+			}
 			return user;
+		} finally {
+			if (prstmt != null) {
+				prstmt.close();
+			}
+			if (rs != null) {
+				rs.close();
+			}
 		}
-
-		conn.close();
-		stmt.close();
-		rs.close();
-		return null;
-
-	}
-
-	public void exit(final User user) throws SQLException {
 	}
 
 }

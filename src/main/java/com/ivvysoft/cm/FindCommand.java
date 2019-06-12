@@ -21,19 +21,18 @@ public class FindCommand implements Command {
 		final int loginedUserId = IdUserSetter.getUserIdLogined();
 
 		final Person person = list.findByFirstOrLastName(loginedUserId, firstName, lastName);
-		if (person == null) {
-			System.out.println("Person not found");
-			System.out.println();
-			return false;
-		} else {
+		if (person != null) {
 			System.out.println("ID: " + person.getId());
 			System.out.println("First Name: " + person.getFirstName());
 			System.out.println("Last Name: " + person.getLastName());
 			System.out.println("Phone: " + person.getPhone());
 			System.out.println("Email: " + person.getEmail());
 			System.out.println();
-			return true;
+		} else {
+			System.out.println("Person not found");
+			System.out.println();
 		}
+		return true;
 
 	}
 

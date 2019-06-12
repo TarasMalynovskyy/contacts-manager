@@ -22,7 +22,7 @@ public class AppStart {
 				if (permissionCheck && IdUserSetter.getUserIdLogined() != 0) {
 					loginedUser();
 				} else if (permissionCheck && IdUserSetter.getUserIdLogined() == 0) {
-					anonimUser();
+					//
 				} else {
 					DataBaseConnection.getInstance().close();
 					n = 0;
@@ -43,18 +43,17 @@ public class AppStart {
 			final int commandPosition = Integer.parseInt(scan.nextLine());
 			final boolean permissionCheck = invoker.execute(commandPosition, scan);
 			if (permissionCheck) {
-				invoker.execute(commandPosition, scan);
+				//
 			} else {
 				DataBaseConnection.getInstance().close();
 				n = 0;
 			}
 		}
 		return true;
-
 	}
 
 	public void start() throws ClassNotFoundException, SQLException {
-		invokerAnonim.register(new ExitCommand(usersRepository));
+		invokerAnonim.register(new ExitCommand());
 		invokerAnonim.register(new RegistrationCommand(usersRepository));
 		invokerAnonim.register(new LoginCommand(usersRepository));
 

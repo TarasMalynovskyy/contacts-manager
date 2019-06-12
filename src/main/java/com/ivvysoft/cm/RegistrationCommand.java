@@ -1,6 +1,7 @@
 package com.ivvysoft.cm;
 
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Scanner;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -32,14 +33,22 @@ public class RegistrationCommand implements Command {
 			final User user = new User();
 			user.setUserName(newUserName);
 			user.setPassword(hashPassword(pass));
-			
-			listAnonim.addNew(user);
-			return true;
+
+			try {
+				listAnonim.addNew(user);
+				System.out.println("---New user was created!---");
+				return true;
+			} catch (SQLIntegrityConstraintViolationException e) {
+				System.out.println();
+				System.out.println("User name already exist, please try another!");
+				System.out.println();
+				execute(scan);
+			}
 		} else {
 			System.out.println("The password does not match, try again");
 			execute(scan);
 		}
-		return false;
+		return true;
 	}
 
 	@Override
