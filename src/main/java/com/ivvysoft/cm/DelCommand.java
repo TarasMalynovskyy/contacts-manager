@@ -5,20 +5,18 @@ import java.util.Scanner;
 
 class DelCommand implements Command {
 
-	private final ListOptionsLogined list;
+	private final PersonRepository list;
 
-	public DelCommand(final ListOptionsLogined list) {
+	public DelCommand(final PersonRepository list) {
 		this.list = list;
 	}
 
-	public boolean execute(final Scanner scan) throws SQLException, ClassNotFoundException {
+	public boolean execute(final Scanner scan) throws SQLException {
+		final int loginedUserId = IdUserSetter.getUserIdLogined();
 		System.out.println("Put Person ID for DELETE: ");
 		final int id = Integer.parseInt(scan.nextLine());
-		final Person person = new Person();
-		person.setId(id);
-		person.setUser_id(IdUserSetter.getUserIdLogined());
 
-		list.del(person);
+		list.delete(loginedUserId, id);
 		return true;
 	}
 

@@ -7,21 +7,14 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class LoginCommand implements Command {
 
-	private final ListOptionsAnonim listAnonim;
+	private final UsersRepository listAnonim;
 
-	public LoginCommand(final ListOptionsAnonim listAnonim) {
+	public LoginCommand(final UsersRepository listAnonim) {
 		this.listAnonim = listAnonim;
 	}
 
-	// private void checkPass(String plainPassword, String hashedPassword) {
-	// if (BCrypt.checkpw(plainPassword, hashedPassword))
-	// System.out.println("The password matches.");
-	// else
-	// System.out.println("The password does not match.");
-	// }
-
 	@Override
-	public boolean execute(final Scanner scan) throws SQLException, ClassNotFoundException {
+	public boolean execute(final Scanner scan) throws SQLException {
 		System.out.println("User Name: ");
 		final String loginName = scan.nextLine();
 		System.out.println("Password: ");
@@ -30,7 +23,6 @@ public class LoginCommand implements Command {
 		final User user = listAnonim.getUserByUsername(loginName);
 
 		if (user != null) {
-			// checkPass(loginPassword, user.getPassword());
 			if (BCrypt.checkpw(loginPassword, user.getPassword())) {
 				System.out.println("User and password is correct!");
 				IdUserSetter.setUserIdLogined(user.getId());

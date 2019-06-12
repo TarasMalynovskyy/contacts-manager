@@ -5,27 +5,36 @@ import java.util.Scanner;
 
 public class FindCommand implements Command {
 
-	private final ListOptionsLogined list;
+	private final PersonRepository list;
 
-	public FindCommand(final ListOptionsLogined list) {
+	public FindCommand(final PersonRepository list) {
 		this.list = list;
 	}
 
-	public boolean execute(final Scanner scan) throws SQLException, ClassNotFoundException {
+	public boolean execute(final Scanner scan) throws SQLException {
 		System.out.println("Put first name or last name of person:");
 		System.out.println();
-		System.out.print("Name: ");
-		final String name = scan.nextLine();
+		System.out.print("First Name: ");
+		final String firstName = scan.nextLine();
 		System.out.println("Last Name: ");
 		final String lastName = scan.nextLine();
+		final int loginedUserId = IdUserSetter.getUserIdLogined();
 
-		final Person person = new Person();
-		person.setFirstName(name);
-		person.setLastName(lastName);
-		person.setUser_id(IdUserSetter.getUserIdLogined());
+		final Person person = list.findByFirstOrLastName(loginedUserId, firstName, lastName);
+		if (person == null) {
+			System.out.println("Person not found");
+			System.out.println();
+			return false;
+		} else {
+			System.out.println("ID: " + person.getId());
+			System.out.println("First Name: " + person.getFirstName());
+			System.out.println("Last Name: " + person.getLastName());
+			System.out.println("Phone: " + person.getPhone());
+			System.out.println("Email: " + person.getEmail());
+			System.out.println();
+			return true;
+		}
 
-		list.find(person);
-		return true;
 	}
 
 	@Override

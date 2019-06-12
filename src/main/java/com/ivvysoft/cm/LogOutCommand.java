@@ -6,8 +6,8 @@ import java.util.Scanner;
 public class LogOutCommand implements Command{
 
 	@Override
-	public boolean execute(Scanner scan) throws SQLException, ClassNotFoundException {
-		return true;
+	public boolean execute(Scanner scan) throws SQLException {
+		return false;
 	}
 
 	@Override

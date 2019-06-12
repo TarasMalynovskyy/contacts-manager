@@ -7,9 +7,9 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class RegistrationCommand implements Command {
 
-	private final ListOptionsAnonim listAnonim;
+	private final UsersRepository listAnonim;
 
-	public RegistrationCommand(final ListOptionsAnonim listAnonim) {
+	public RegistrationCommand(final UsersRepository listAnonim) {
 		this.listAnonim = listAnonim;
 	}
 
@@ -18,25 +18,28 @@ public class RegistrationCommand implements Command {
 	}
 
 	@Override
-	public boolean execute(final Scanner scan) throws SQLException, ClassNotFoundException {
+	public boolean execute(final Scanner scan) throws SQLException {
 		System.out.println("Put new User Name");
-		final String newUserName = scan.nextLine();
+		String newUserName = scan.nextLine();
 		System.out.println("Put your password");
-		final String pass = scan.nextLine();
+		String pass = scan.nextLine();
 		System.out.println("Put your password again");
 		final String pass2 = scan.nextLine();
-		if (pass.equals(pass2)) {
+		if (((newUserName == null) || (newUserName.isEmpty())) || ((pass == null) || (pass.isEmpty()))) {
+			System.out.println("Password or Login is incorrect");
+			execute(scan);
+		} else if (pass.equals(pass2)) {
 			final User user = new User();
 			user.setUserName(newUserName);
 			user.setPassword(hashPassword(pass));
-
-			listAnonim.insertNewUser(user);
-
+			
+			listAnonim.addNew(user);
+			return true;
 		} else {
 			System.out.println("The password does not match, try again");
 			execute(scan);
 		}
-		return true;
+		return false;
 	}
 
 	@Override

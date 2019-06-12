@@ -7,6 +7,6 @@ public interface Command {
 	
 	String getDescription();
 	
-	boolean execute(final Scanner scan) throws SQLException, ClassNotFoundException;
+	boolean execute(final Scanner scan) throws SQLException;
 	
 }

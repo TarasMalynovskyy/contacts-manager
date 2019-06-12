@@ -5,58 +5,69 @@ import java.util.Scanner;
 
 public class AppStart {
 
-	public void start() throws ClassNotFoundException, SQLException {
+	final Scanner scan = new Scanner(System.in);
+	final PersonRepository personsRepository = new PersonRepository();
+	final UsersRepository usersRepository = new UsersRepository();
+	final Invoker invoker = new Invoker();
+	final Invoker invokerAnonim = new Invoker();
 
-		final Scanner scan = new Scanner(System.in);
-		final ListOptionsLogined l = new ListOptionsLogined();
-		final ListOptionsAnonim lA = new ListOptionsAnonim();
-		final Invoker i = new Invoker();
-		final Invoker iA = new Invoker();
-
-		iA.register(new ExitCommand(lA));
-		iA.register(new RegistrationCommand(lA));
-		iA.register(new LoginCommand(lA));
-		i.register(new LogOutCommand());
-		i.register(new FindCommand(l));
-		i.register(new AddCommand(l));
-		i.register(new DelCommand(l));
-		i.register(new EditCommand(l));
-		i.register(new ShowAllCommand(l));
-		i.register(new EmailSendingCommand(l));
-
+	private boolean anonimUser() throws SQLException, ClassNotFoundException {
 		System.out.println("Hello, u can choose the option:");
-
 		int n = 1;
 		while (n != 0) {
-			iA.printAvailableCommands();
+			invokerAnonim.printAvailableCommands();
 			try {
 				final int commandPositionAnonim = Integer.parseInt(scan.nextLine());
-				if (commandPositionAnonim == 0) {
+				final boolean permissionCheck = invokerAnonim.execute(commandPositionAnonim, scan);
+				if (permissionCheck && IdUserSetter.getUserIdLogined() != 0) {
+					loginedUser();
+				} else if (permissionCheck && IdUserSetter.getUserIdLogined() == 0) {
+					anonimUser();
+				} else {
 					DataBaseConnection.getInstance().close();
 					n = 0;
-				} else if (commandPositionAnonim == 2 && iA.execute(commandPositionAnonim, scan)) {
-					while (n != -1) {
-						i.printAvailableCommands();
-						final int commandPosition = Integer.parseInt(scan.nextLine());
-						if (commandPosition == 0) {
-							n = -1;
-						} else {
-							try {
-								i.execute(commandPosition, scan);
-							} catch (NumberFormatException e) {
-								System.out.println("U put unexceptable number!");
-							}
-						}
-					}
-				} else if (commandPositionAnonim == 1) {
-					iA.execute(commandPositionAnonim, scan);
 				}
-			} catch (NumberFormatException e) {
-				System.out.println("U put unexceptable !");
-			} catch (IllegalStateException e) {
-				System.out.println("U put unexceptable 2!");
+			} catch (IndexOutOfBoundsException | NumberFormatException e) {
+				System.out.println();
+				System.out.println("---Choose one option---");
+				System.out.println();
 			}
 		}
+		return true;
+	}
+
+	private boolean loginedUser() throws SQLException, ClassNotFoundException {
+		int n = 1;
+		while (n != 0) {
+			invoker.printAvailableCommands();
+			final int commandPosition = Integer.parseInt(scan.nextLine());
+			final boolean permissionCheck = invoker.execute(commandPosition, scan);
+			if (permissionCheck) {
+				invoker.execute(commandPosition, scan);
+			} else {
+				DataBaseConnection.getInstance().close();
+				n = 0;
+			}
+		}
+		return true;
+
+	}
+
+	public void start() throws ClassNotFoundException, SQLException {
+		invokerAnonim.register(new ExitCommand(usersRepository));
+		invokerAnonim.register(new RegistrationCommand(usersRepository));
+		invokerAnonim.register(new LoginCommand(usersRepository));
+
+		invoker.register(new LogOutCommand());
+		invoker.register(new FindCommand(personsRepository));
+		invoker.register(new AddCommand(personsRepository));
+		invoker.register(new DelCommand(personsRepository));
+		invoker.register(new EditCommand(personsRepository));
+		invoker.register(new ShowAllCommand(personsRepository));
+		invoker.register(new EmailSendingCommand(personsRepository));
+
+		anonimUser();
+
 		scan.close();
 	}
 }

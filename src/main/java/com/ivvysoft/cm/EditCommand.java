@@ -5,9 +5,9 @@ import java.util.Scanner;
 
 class EditCommand implements Command {
 
-	private final ListOptionsLogined list;
+	private final PersonRepository list;
 
-	public EditCommand(ListOptionsLogined list) {
+	public EditCommand(PersonRepository list) {
 		this.list = list;
 	}
 
@@ -29,9 +29,17 @@ class EditCommand implements Command {
 		person.setLastName(lastName);
 		person.setPhone(phone);
 		person.setEmail(email);
-		person.setUser_id(IdUserSetter.getUserIdLogined());
+		person.setUserId(IdUserSetter.getUserIdLogined());
 
-		list.edit(person);
+		final Person person2 = list.edit(person);
+		if (person2 != null) {
+			System.out.println("New ID: " + person2.getId());
+			System.out.println("New First Name: " + person2.getFirstName());
+			System.out.println("New Last Name: " + person2.getLastName());
+			System.out.println("New Phone: " + person2.getPhone());
+			System.out.println("New Email: " + person2.getEmail());
+			System.out.println();
+		}
 		return true;
 	}
 

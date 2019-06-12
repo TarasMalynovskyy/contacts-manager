@@ -5,16 +5,14 @@ import java.util.Scanner;
 
 class ExitCommand implements Command {
 
-	private final ListOptionsAnonim listAnonim;
+	private final UsersRepository listAnonim;
 
-	public ExitCommand(final ListOptionsAnonim listAnonim) {
+	public ExitCommand(final UsersRepository listAnonim) {
 		this.listAnonim = listAnonim;
 	}
 
-	public boolean execute(final Scanner scan) throws SQLException, ClassNotFoundException {
-		final User user = new User();
-		listAnonim.exit(user);
-		return true;
+	public boolean execute(final Scanner scan) throws SQLException {
+		return false;
 	}
 
 	@Override

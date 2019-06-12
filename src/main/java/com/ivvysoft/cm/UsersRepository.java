@@ -7,9 +7,9 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 
-public class ListOptionsAnonim {
+public class UsersRepository {
 
-	void insertNewUser(final User user) throws SQLException {
+	public void addNew(final User user) throws SQLException {
 		final String SQL = "INSERT INTO users (user_name, password) VALUES (?,?)";
 		final Connection conn = DataBaseConnection.getInstance().getConnection();
 		final PreparedStatement prstmt = conn.prepareStatement(SQL);
@@ -51,8 +51,7 @@ public class ListOptionsAnonim {
 
 	}
 
-	void exit(final User user) throws SQLException {
-		
+	public void exit(final User user) throws SQLException {
 	}
 
 }

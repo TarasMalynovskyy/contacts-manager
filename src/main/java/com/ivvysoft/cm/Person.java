@@ -3,19 +3,19 @@ package com.ivvysoft.cm;
 public class Person {
 
 	private int id;
-	private int user_id;
+	private int userId;
 	private String firstName;
 	private String lastName;
 	private String phone;
 	private String email;
 	private String amountContacts;
 
-	public int getUser_id() {
-		return user_id;
+	public int getUserId() {
+		return userId;
 	}
 
-	public void setUser_id(int user_id) {
-		this.user_id = user_id;
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 
 	public String getAmountContacts() {
@@ -68,8 +68,8 @@ public class Person {
 
 	@Override
 	public String toString() {
-		return "Person ID: " + id + ", First Name: " + firstName + ", Last Name: " + lastName
-				+ ", Phone: " + phone + ", Email: " + email+"\n";
+		return "\nPerson ID: " + id + "\nFirst Name: " + firstName + "\nLast Name: " + lastName
+				+ "\nPhone: " + phone + "\nEmail: " + email+ " \n";
 	}
 	
 	

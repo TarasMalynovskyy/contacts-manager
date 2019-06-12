@@ -1,29 +1,30 @@
 package com.ivvysoft.cm;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 class ShowAllCommand implements Command {
 
-	private final ListOptionsLogined list;
+	private final PersonRepository list;
 
-	public ShowAllCommand(final ListOptionsLogined list) {
+	public ShowAllCommand(final PersonRepository list) {
 		this.list = list;
 	}
 
-	public boolean execute(final Scanner scan) throws SQLException, ClassNotFoundException {
-		final Person person = new Person();
+	public boolean execute(final Scanner scan) throws SQLException {
+		final int loginedUserId = IdUserSetter.getUserIdLogined();
 
-		person.setFirstName("first_name");
-		person.setLastName("last_name");
-		person.setPhone("phone");
-		person.setEmail("email");
-		person.setAmountContacts("count");
-		person.setUser_id(IdUserSetter.getUserIdLogined());
+		List<Person> listOfPersons = list.showAll(loginedUserId);
+		
+		for (Person p : listOfPersons) {
+			System.out.println(p);
+		}
 
-		list.showAll(person);
+		System.out.println("You have " + listOfPersons.size() + " persons in your list");
+		System.out.println();
+		
 		return true;
-
 	}
 
 	@Override
