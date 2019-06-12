@@ -25,15 +25,14 @@ public class EmailSendingCommand implements Command {
 		System.out.println("Enter email of reciver");
 		final String emailAddress = scan.nextLine();
 		final int loginedUserId = IdUserSetter.getUserIdLogined();
-		
-		
+
 		List<Person> persons = null;
 		if (id == 000) {
 			persons = listOptionsLogined.showAll(loginedUserId);
 		} else {
-			persons = listOptionsLogined.selectAllByUserAndPersonId(loginedUserId,id);
+			persons = listOptionsLogined.selectAllByUserAndPersonId(loginedUserId, id);
 		}
-		
+
 		Mailer mailer = MailerBuilder
 				.withSMTPServer("smtp.gmail.com", 587, "com.ivvysoft.contactsmanager@gmail.com", "Contacts1408988")
 				.buildMailer();
