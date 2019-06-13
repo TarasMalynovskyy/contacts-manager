@@ -2,12 +2,23 @@ package com.ivvysoft.cm;
 
 import java.sql.SQLException;
 import java.util.Scanner;
+import com.ivvysoft.cm.command.Invoker;
+import com.ivvysoft.cm.command.anonim.ExitCommand;
+import com.ivvysoft.cm.command.anonim.LoginCommand;
+import com.ivvysoft.cm.command.anonim.RegistrationCommand;
+import com.ivvysoft.cm.command.logedin.CreateCommand;
+import com.ivvysoft.cm.command.logedin.DelCommand;
+import com.ivvysoft.cm.command.logedin.EditCommand;
+import com.ivvysoft.cm.command.logedin.EmailSendingCommand;
+import com.ivvysoft.cm.command.logedin.FindCommand;
+import com.ivvysoft.cm.command.logedin.LogOutCommand;
+import com.ivvysoft.cm.command.logedin.ShowAllCommand;
+import com.ivvysoft.cm.repository.DataBaseConnection;
 
 public class AppStart {
 
 	final Scanner scan = new Scanner(System.in);
-	final PersonRepository personsRepository = new PersonRepository();
-	final UsersRepository usersRepository = new UsersRepository();
+	final Environment environment = new Environment();
 	final Invoker invoker = new Invoker();
 	final Invoker invokerAnonim = new Invoker();
 
@@ -16,12 +27,14 @@ public class AppStart {
 		int n = 1;
 		while (n != 0) {
 			invokerAnonim.printAvailableCommands();
+
 			try {
 				final int commandPositionAnonim = Integer.parseInt(scan.nextLine());
 				final boolean permissionCheck = invokerAnonim.execute(commandPositionAnonim, scan);
-				if (permissionCheck && IdUserSetter.getUserIdLogined() != 0) {
+
+				if (permissionCheck && environment.getUserId() != 0) {
 					loginedUser();
-				} else if (permissionCheck && IdUserSetter.getUserIdLogined() == 0) {
+				} else if (permissionCheck && environment.getUserId() == 0) {
 					//
 				} else {
 					DataBaseConnection.getInstance().close();
@@ -33,6 +46,7 @@ public class AppStart {
 				System.out.println();
 			}
 		}
+
 		return true;
 	}
 
@@ -40,8 +54,10 @@ public class AppStart {
 		int n = 1;
 		while (n != 0) {
 			invoker.printAvailableCommands();
+
 			final int commandPosition = Integer.parseInt(scan.nextLine());
 			final boolean permissionCheck = invoker.execute(commandPosition, scan);
+
 			if (permissionCheck) {
 				//
 			} else {
@@ -49,21 +65,22 @@ public class AppStart {
 				n = 0;
 			}
 		}
+
 		return true;
 	}
 
 	public void start() throws ClassNotFoundException, SQLException {
 		invokerAnonim.register(new ExitCommand());
-		invokerAnonim.register(new RegistrationCommand(usersRepository));
-		invokerAnonim.register(new LoginCommand(usersRepository));
+		invokerAnonim.register(new RegistrationCommand(environment));
+		invokerAnonim.register(new LoginCommand(environment));
 
 		invoker.register(new LogOutCommand());
-		invoker.register(new FindCommand(personsRepository));
-		invoker.register(new AddCommand(personsRepository));
-		invoker.register(new DelCommand(personsRepository));
-		invoker.register(new EditCommand(personsRepository));
-		invoker.register(new ShowAllCommand(personsRepository));
-		invoker.register(new EmailSendingCommand(personsRepository));
+		invoker.register(new FindCommand(environment));
+		invoker.register(new CreateCommand(environment));
+		invoker.register(new DelCommand(environment));
+		invoker.register(new EditCommand(environment));
+		invoker.register(new ShowAllCommand(environment));
+		invoker.register(new EmailSendingCommand(environment));
 
 		anonimUser();
 
