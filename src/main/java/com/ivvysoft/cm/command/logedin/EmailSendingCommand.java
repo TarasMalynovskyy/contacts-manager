@@ -32,6 +32,7 @@ public class EmailSendingCommand implements Command {
 		final String inputEmail = scan.nextLine();
 
 		final int loginedUserId = environment.getUserId();
+		
 		final String emailValidationPattern = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)"
 				+ "*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
 
