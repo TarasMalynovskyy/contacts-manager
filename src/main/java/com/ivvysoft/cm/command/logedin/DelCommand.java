@@ -10,7 +10,6 @@ public class DelCommand implements Command {
 
 	private final Environment environment;
 
-
 	public DelCommand(final Environment environment) {
 		this.environment = environment;
 	}

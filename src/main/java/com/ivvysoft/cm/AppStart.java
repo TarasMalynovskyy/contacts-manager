@@ -2,6 +2,7 @@ package com.ivvysoft.cm;
 
 import java.sql.SQLException;
 import java.util.Scanner;
+
 import com.ivvysoft.cm.command.Invoker;
 import com.ivvysoft.cm.command.anonim.ExitCommand;
 import com.ivvysoft.cm.command.anonim.LoginCommand;
@@ -13,7 +14,7 @@ import com.ivvysoft.cm.command.logedin.EmailSendingCommand;
 import com.ivvysoft.cm.command.logedin.FindCommand;
 import com.ivvysoft.cm.command.logedin.LogOutCommand;
 import com.ivvysoft.cm.command.logedin.ShowAllCommand;
-import com.ivvysoft.cm.repository.DataBaseConnection;
+import com.ivvysoft.cm.util.HibernateSessionFactoryUtil;
 
 public class AppStart {
 
@@ -37,7 +38,7 @@ public class AppStart {
 				} else if (permissionCheck && environment.getUserId() == 0) {
 					//
 				} else {
-					DataBaseConnection.getInstance().close();
+					HibernateSessionFactoryUtil.factoryClose();
 					n = 0;
 				}
 			} catch (IndexOutOfBoundsException | NumberFormatException e) {
@@ -61,7 +62,7 @@ public class AppStart {
 			if (permissionCheck) {
 				//
 			} else {
-				DataBaseConnection.getInstance().close();
+				HibernateSessionFactoryUtil.closeCurrentSession();
 				n = 0;
 			}
 		}

@@ -1,213 +1,114 @@
 package com.ivvysoft.cm.repository;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Query;
+
 import com.ivvysoft.cm.model.Person;
+import com.ivvysoft.cm.util.HibernateSessionFactoryUtil;
 
 public class PersonRepository {
 
-	private final String FIND_BY_FIRST_OR_LAST_NAME_SQL = "SELECT * FROM persons AS p WHERE p.first_name = ? OR p.last_name = ? AND p.user_id = ?";
-	
-	public Person findByFirstOrLastName(
-			final int userId, final String firstName, final String lastName) throws SQLException {
-		PreparedStatement prstmt = null;
-		ResultSet rs = null;
+	private final String FIND_BY_FIRST_OR_LAST_NAME_HQL = "FROM Person AS p WHERE p.firstName = :firstName  "
+			+ "OR p.lastName = :lastName AND p.userId = :userId";
 
+	public Person findByFirstOrLastName(final int userId, final String firstName, final String lastName)
+			throws SQLException {
 		try {
-			prstmt = DataBaseConnection.getInstance().getConnection().prepareStatement(FIND_BY_FIRST_OR_LAST_NAME_SQL);
-			prstmt.setString(1, firstName);
-			prstmt.setString(2, lastName);
-			prstmt.setInt(3, userId);
-			rs = prstmt.executeQuery();
-
-			Person person = null;
-			while (rs.next()) {
-				person = extractFromResultSet(rs);
-			}
-
+			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
+			final Query query = HibernateSessionFactoryUtil.getSessionFactory()
+					.createQuery(FIND_BY_FIRST_OR_LAST_NAME_HQL);
+			query.setParameter("firstName", firstName);
+			query.setParameter("lastName", lastName);
+			query.setParameter("userId", userId);
+			final Person person = (Person) query.getSingleResult();;
+			
 			return person;
 		} finally {
-			if (prstmt != null) {
-				prstmt.close();
-			}
-
-			if (rs != null) {
-				rs.close();
-			}
+			HibernateSessionFactoryUtil.closeCurrentSession();
 		}
 	}
-
-	private final String SHOW_ALL_SQL = "SELECT * FROM persons AS p WHERE p.user_id = ?";
 	
+	private final String SHOW_ALL_HQL = "FROM Person AS p WHERE p.userId = :userId";
+
 	public List<Person> showAll(final int userId) throws SQLException {
-		PreparedStatement prstmt = null;
-		ResultSet rs = null;
-
 		try {
-			prstmt = DataBaseConnection.getInstance().getConnection().prepareStatement(SHOW_ALL_SQL);
-			prstmt.setInt(1, userId);
-			rs = prstmt.executeQuery();
+			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
+			final Query query = HibernateSessionFactoryUtil.getSessionFactory()
+					.createQuery(SHOW_ALL_HQL);
+			query.setParameter("userId", userId);
+			
+			@SuppressWarnings("unchecked")
+			final List<Person> persons = query.getResultList();
 
-			final List<Person> listOfPersons = new ArrayList<Person>();
-			while (rs.next()) {
-				listOfPersons.add(extractFromResultSet(rs));
-			}
-
-			return listOfPersons;
+			return persons;
 		} finally {
-			if (prstmt != null) {
-				prstmt.close();
-			}
-
-			if (rs != null) {
-				rs.close();
-			}
+			HibernateSessionFactoryUtil.closeCurrentSession();
 		}
 	}
-	
-	private final String CREATE_SQL = "INSERT INTO persons AS p (p.first_name, p.last_name, p.phone, p.email, p.user_id) VALUES (?,?,?,?,?)";
-	private final String CREATE_SQL_VIEW = "SELECT * FROM persons AS p WHERE p.id IN (SELECT @@IDENTITY)";
 
-	public Person create(final Person person) throws SQLException {
-		PreparedStatement prstmtInsert = null;
-		PreparedStatement prstmtSelect = null;
-		ResultSet rs = null;
-
+	public void create(final Person person) throws SQLException {
 		try {
-			prstmtInsert = DataBaseConnection.getInstance().getConnection().prepareStatement(CREATE_SQL);
-			prstmtInsert.setString(1, person.getFirstName());
-			prstmtInsert.setString(2, person.getLastName());
-			prstmtInsert.setString(3, person.getPhone());
-			prstmtInsert.setString(4, person.getEmail());
-			prstmtInsert.setInt(5, person.getUserId());
-			prstmtInsert.executeUpdate();
+			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
+			HibernateSessionFactoryUtil.getSessionFactory().save(person);
+		} finally {
+			HibernateSessionFactoryUtil.closeCurrentSession();
+		}
+	}
 
-			prstmtSelect = DataBaseConnection.getInstance().getConnection().prepareStatement(CREATE_SQL_VIEW);
-			rs = prstmtSelect.executeQuery();
-			
-			Person p = null;
-			if (rs.next()) {
-				p = extractFromResultSet(rs);
-			}
+	private final String DELETE_HQL = "DELETE FROM Person AS p WHERE p.id = :id AND p.userId = :userId";
+
+	public void delete(final int userId, final int id) throws SQLException {
+		try {
+			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
+			final Query query = HibernateSessionFactoryUtil.getSessionFactory().createQuery(DELETE_HQL);
+			query.setParameter("id", id);
+			query.setParameter("userId", userId);
+			query.executeUpdate();
+			HibernateSessionFactoryUtil.getSessionFactory().getTransaction().commit();
+		} finally {
+			HibernateSessionFactoryUtil.closeCurrentSession();
+		}
+	}
+
+	public Person edit(final Person person) throws SQLException {
+		try {
+			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
+			HibernateSessionFactoryUtil.getSessionFactory().update(person);
+			final Person p = HibernateSessionFactoryUtil.getSessionFactory().get(Person.class, person.getId());
+			HibernateSessionFactoryUtil.getSessionFactory().getTransaction().commit();
 
 			return p;
 		} finally {
-			if (prstmtInsert != null) {
-				prstmtInsert.close();
-			}
-
-			if (prstmtSelect != null) {
-				prstmtSelect.close();
-			}
-
-			if (rs != null) {
-				rs.close();
-			}
+			HibernateSessionFactoryUtil.closeCurrentSession();
 		}
 	}
-	
-	private final String DELETE_SQL = "DELETE FROM persons AS p WHERE p.id = ? AND p.user_id = ?";
 
-	public void delete(final int userId, final int id) throws SQLException {
-		PreparedStatement prstmt = null;
-
+	public Person findById(final int id) {
 		try {
-			prstmt = DataBaseConnection.getInstance().getConnection().prepareStatement(DELETE_SQL);
-			prstmt.setInt(1, id);
-			prstmt.setInt(2, userId);
-			prstmt.executeQuery();
-		} finally {
-			if (prstmt != null) {
-				prstmt.close();
-			}
-		}
-
-	}
-
-	private final String EDIT_SQL = "UPDATE persons AS p SET p.first_name = ?, p.last_name = ?, p.phone = ?, p.email = ? WHERE p.id = ? AND p.user_id = ?";
-	private final String EDIT_SQL_VIEW = "SELECT * FROM persons AS p WHERE p.id = ?";
-
-	public Person edit(final Person person) throws SQLException {
-		PreparedStatement prstmtUpdate = null;
-		PreparedStatement prstmtSelect = null;
-		ResultSet rs = null;
-
-		try {
-			prstmtUpdate = DataBaseConnection.getInstance().getConnection().prepareStatement(EDIT_SQL);
-			prstmtUpdate.setString(1, person.getFirstName());
-			prstmtUpdate.setString(2, person.getLastName());
-			prstmtUpdate.setString(3, person.getPhone());
-			prstmtUpdate.setString(4, person.getEmail());
-			prstmtUpdate.setInt(5, person.getId());
-			prstmtUpdate.setInt(6, person.getUserId());
-			prstmtUpdate.executeUpdate();
-
-			prstmtSelect = DataBaseConnection.getInstance().getConnection().prepareStatement(EDIT_SQL_VIEW);
-			prstmtSelect.setInt(1, person.getId());
-			rs = prstmtSelect.executeQuery();
-
-			Person p1 = null;
-			if (rs.next()) {
-				p1 = extractFromResultSet(rs);
-			}
-
-			return p1;
-		} finally {
-			if (prstmtUpdate != null) {
-				prstmtUpdate.close();
-			}
-
-			if (prstmtSelect != null) {
-				prstmtSelect.close();
-			}
-
-			if (rs != null) {
-				rs.close();
-			}
-		}
-	}
-	
-	private final String FIND_BY_ID_SQL = "SELECT * FROM persons WHERE user_id = ? AND id = ?";
-	
-	public Person findById(final int userId, final int id) throws SQLException {
-		PreparedStatement prstmt = null;
-		ResultSet rs = null;
-
-		try {
-			prstmt = DataBaseConnection.getInstance().getConnection().prepareStatement(FIND_BY_ID_SQL);
-			prstmt.setInt(1, userId);
-			prstmt.setInt(2, id);
-			rs = prstmt.executeQuery();
-
-			Person person = null;
-			while (rs.next()) {
-				person = extractFromResultSet(rs);
-			}
+			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
+			final Person person = HibernateSessionFactoryUtil.getSessionFactory().get(Person.class, id);
 
 			return person;
 		} finally {
-			if (prstmt != null) {
-				prstmt.close();
-			}
-
-			if (rs != null) {
-				rs.close();
-			}
+			HibernateSessionFactoryUtil.closeCurrentSession();
 		}
 	}
 
-	private Person extractFromResultSet(final ResultSet rs) throws SQLException {
-		final Person person = new Person();
-		person.setId(rs.getInt("id"));
-		person.setFirstName(rs.getString("first_name"));
-		person.setLastName(rs.getString("last_name"));
-		person.setPhone(rs.getString("phone"));
-		person.setEmail(rs.getString("email"));
+	private final String FIND_BY_USER_ID_HQL = "FROM Person AS p WHERE p.id = :id AND p.userId = :userId";
 
-		return person;
+	public Person findByUserId(final int userId, final int id) throws SQLException {
+		try {
+			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
+			final Query query = HibernateSessionFactoryUtil.getSessionFactory().createQuery(FIND_BY_USER_ID_HQL);
+			query.setParameter("id", id);
+			query.setParameter("userId", userId);
+			query.executeUpdate();
+			final Person person = HibernateSessionFactoryUtil.getSessionFactory().get(Person.class, id);
+			return person;
+		} finally {
+			HibernateSessionFactoryUtil.closeCurrentSession();
+		}
 	}
 }

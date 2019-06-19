@@ -6,6 +6,7 @@ import java.util.Scanner;
 import com.ivvysoft.cm.Environment;
 import com.ivvysoft.cm.command.Command;
 import com.ivvysoft.cm.model.Person;
+import com.ivvysoft.cm.util.PersonUtils;
 
 public class FindCommand implements Command {
 
@@ -24,13 +25,10 @@ public class FindCommand implements Command {
 		final String lastName = scan.nextLine();
 
 		final Person person = environment.getPersonRepository().findByFirstOrLastName(loginedUserId, firstName, lastName);
+		
+		
 		if (person != null) {
-			System.out.println("ID: " + person.getId());
-			System.out.println("First Name: " + person.getFirstName());
-			System.out.println("Last Name: " + person.getLastName());
-			System.out.println("Phone: " + person.getPhone());
-			System.out.println("Email: " + person.getEmail());
-			System.out.println();
+			PersonUtils.personToString(person);
 		} else {
 			System.out.println("Person not found\n");
 		}

@@ -1,58 +1,37 @@
 package com.ivvysoft.cm.repository;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.persistence.Query;
+
 import com.ivvysoft.cm.model.User;
+import com.ivvysoft.cm.util.HibernateSessionFactoryUtil;
 
 public class UserRepository {
-	
-	private final String CREATE_SQL = "INSERT INTO users (user_name, password) VALUES (?,?)";
-	
+
 	public void create(final User user) throws SQLException {
-		PreparedStatement prstmt = null;
-		
 		try {
-			prstmt = DataBaseConnection.getInstance().getConnection().prepareStatement(CREATE_SQL);
-			prstmt.setString(1, user.getUserName());
-			prstmt.setString(2, user.getPassword());
-			prstmt.executeUpdate();
+			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
+			HibernateSessionFactoryUtil.getSessionFactory().save(user);
+			HibernateSessionFactoryUtil.getSessionFactory().getTransaction().commit();
 		} finally {
-			if (prstmt != null) {
-				prstmt.close();
-			}
+			HibernateSessionFactoryUtil.closeCurrentSession();
 		}
 	}
 
-	private final String FIND_USER_BY_USERNAME_SQL = "SELECT * FROM users WHERE user_name = ?";
-	
-	public User findUserByUsername(final String userName) throws SQLException {
-		PreparedStatement prstmt = null;
-		ResultSet rs = null;
-		
-		try {
-			prstmt = DataBaseConnection.getInstance().getConnection().prepareStatement(FIND_USER_BY_USERNAME_SQL);
-			prstmt.setString(1, userName);
-			rs = prstmt.executeQuery();
+	private final String FIND_BY_USER_NAME = "FROM User AS u WHERE u.userName = :userName";
 
-			User user = null;
-			while (rs.next()) {
-				user = new User();
-				user.setId(rs.getInt("id"));
-				user.setUserName(rs.getString("user_name"));
-				user.setPassword(rs.getString("password"));
-			}
-			
+	public User findByUserName(final String userName) throws SQLException {
+		try {
+			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
+			Query query = HibernateSessionFactoryUtil.getSessionFactory().createQuery(FIND_BY_USER_NAME);
+			query.setParameter("userName", userName);
+			final User user = (User) query.getSingleResult();
+			HibernateSessionFactoryUtil.getSessionFactory().getTransaction().commit();
+
 			return user;
 		} finally {
-			if (prstmt != null) {
-				prstmt.close();
-			}
-			
-			if (rs != null) {
-				rs.close();
-			}
+			HibernateSessionFactoryUtil.closeCurrentSession();
 		}
 	}
 }

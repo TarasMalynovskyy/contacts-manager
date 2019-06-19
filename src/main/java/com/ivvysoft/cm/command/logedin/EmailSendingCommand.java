@@ -46,7 +46,7 @@ public class EmailSendingCommand implements Command {
 			if (id == 000) {
 				persons = environment.getPersonRepository().showAll(loginedUserId);
 			} else {
-				p = environment.getPersonRepository().findById(loginedUserId, id);
+				p = environment.getPersonRepository().findByUserId(loginedUserId, id);
 			}
 
 			Mailer mailer = MailerBuilder

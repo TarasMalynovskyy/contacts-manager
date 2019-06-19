@@ -24,7 +24,7 @@ public class LoginCommand implements Command {
 		System.out.println("Password: ");
 		final String loginPassword = scan.nextLine();
 		
-		final User user = environment.getUserRepository().findUserByUsername(loginName);
+		final User user = environment.getUserRepository().findByUserName(loginName);
 		if (user != null) {
 			if (BCrypt.checkpw(loginPassword, user.getPassword())) {
 				System.out.println("User and password is correct!");
