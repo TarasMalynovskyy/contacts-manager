@@ -1,5 +1,6 @@
 package com.ivvysoft.cm;
 
+import com.ivvysoft.cm.model.User;
 import com.ivvysoft.cm.repository.PersonRepository;
 import com.ivvysoft.cm.repository.UserRepository;
 
@@ -7,10 +8,20 @@ public class Environment {
 	
 	private PersonRepository personRepository = new PersonRepository();
 	private UserRepository userRepository = new UserRepository();
-	private int userId;
+	private User user = null;
+//	private int userId;
+	
 
 	public PersonRepository getPersonRepository() {
 		return personRepository;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public void setPersonRepository(PersonRepository personRepository) {
@@ -25,12 +36,12 @@ public class Environment {
 		this.userRepository = userRepository;
 	}
 
-	public int getUserId() {
-		return userId;
-	}
-
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
+//	public int getUserId() {
+//		return userId;
+//	}
+//
+//	public void setUserId(int userId) {
+//		this.userId = userId;
+//	}
 
 }

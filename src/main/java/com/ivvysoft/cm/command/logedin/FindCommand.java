@@ -17,14 +17,13 @@ public class FindCommand implements Command {
 	}
 
 	public boolean execute(final Scanner scan) throws SQLException {
-		final int loginedUserId = environment.getUserId();
 		System.out.println("Put first name or last name of person:\n");
 		System.out.print("First Name: ");
 		final String firstName = scan.nextLine();
 		System.out.println("Last Name: ");
 		final String lastName = scan.nextLine();
 
-		final Person person = environment.getPersonRepository().findByFirstOrLastName(loginedUserId, firstName, lastName);
+		final Person person = environment.getPersonRepository().findByFirstOrLastName(environment.getUser(), firstName, lastName);
 		
 		
 		if (person != null) {

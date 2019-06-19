@@ -15,10 +15,9 @@ public class DelCommand implements Command {
 	}
 
 	public boolean execute(final Scanner scan) throws SQLException {
-		final int loginedUserId = environment.getUserId();
 		System.out.println("Put Person ID for DELETE: ");
 		final int id = Integer.parseInt(scan.nextLine());
-		environment.getPersonRepository().delete(loginedUserId, id);
+		environment.getPersonRepository().delete(environment.getUser(), id);
 		
 		return true;
 	}

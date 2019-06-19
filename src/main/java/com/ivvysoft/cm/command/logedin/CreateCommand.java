@@ -25,14 +25,14 @@ public class CreateCommand implements Command {
 		final String phone = scan.nextLine();
 		System.out.println("Put email of new person:\n");
 		final String email = scan.nextLine();
-
+		
 		final Person person = new Person();
 		person.setFirstName(firstName);
 		person.setLastName(lastName);
 		person.setPhone(phone);
 		person.setEmail(email);
-		person.setUserId(environment.getUserId());
-
+		person.setUser(environment.getUser());
+		
 		environment.getPersonRepository().create(person);
 		
 		if (person != null) {

@@ -6,14 +6,15 @@ import java.util.List;
 import javax.persistence.Query;
 
 import com.ivvysoft.cm.model.Person;
+import com.ivvysoft.cm.model.User;
 import com.ivvysoft.cm.util.HibernateSessionFactoryUtil;
 
 public class PersonRepository {
 
 	private final String FIND_BY_FIRST_OR_LAST_NAME_HQL = "FROM Person AS p WHERE p.firstName = :firstName  "
-			+ "OR p.lastName = :lastName AND p.userId = :userId";
+			+ "OR p.lastName = :lastName AND p.user.id = :userId";
 
-	public Person findByFirstOrLastName(final int userId, final String firstName, final String lastName)
+	public Person findByFirstOrLastName(final User user, final String firstName, final String lastName)
 			throws SQLException {
 		try {
 			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
@@ -21,7 +22,7 @@ public class PersonRepository {
 					.createQuery(FIND_BY_FIRST_OR_LAST_NAME_HQL);
 			query.setParameter("firstName", firstName);
 			query.setParameter("lastName", lastName);
-			query.setParameter("userId", userId);
+			query.setParameter("userId", user.getId());
 			final Person person = (Person) query.getSingleResult();;
 			
 			return person;
@@ -30,14 +31,14 @@ public class PersonRepository {
 		}
 	}
 	
-	private final String SHOW_ALL_HQL = "FROM Person AS p WHERE p.userId = :userId";
+	private final String SHOW_ALL_HQL = "FROM Person AS p WHERE p.user.id = :userId";
 
-	public List<Person> showAll(final int userId) throws SQLException {
+	public List<Person> showAll(final User user) throws SQLException {
 		try {
 			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
 			final Query query = HibernateSessionFactoryUtil.getSessionFactory()
 					.createQuery(SHOW_ALL_HQL);
-			query.setParameter("userId", userId);
+			query.setParameter("userId", user.getId());
 			
 			@SuppressWarnings("unchecked")
 			final List<Person> persons = query.getResultList();
@@ -57,14 +58,14 @@ public class PersonRepository {
 		}
 	}
 
-	private final String DELETE_HQL = "DELETE FROM Person AS p WHERE p.id = :id AND p.userId = :userId";
+	private final String DELETE_HQL = "DELETE FROM Person AS p WHERE p.id = :id AND user_id = :userId";
 
-	public void delete(final int userId, final int id) throws SQLException {
+	public void delete(final User user, final int id) throws SQLException {
 		try {
 			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
 			final Query query = HibernateSessionFactoryUtil.getSessionFactory().createQuery(DELETE_HQL);
 			query.setParameter("id", id);
-			query.setParameter("userId", userId);
+			query.setParameter("userId", user.getId());
 			query.executeUpdate();
 			HibernateSessionFactoryUtil.getSessionFactory().getTransaction().commit();
 		} finally {
@@ -96,14 +97,14 @@ public class PersonRepository {
 		}
 	}
 
-	private final String FIND_BY_USER_ID_HQL = "FROM Person AS p WHERE p.id = :id AND p.userId = :userId";
+	private final String FIND_BY_USER_ID_HQL = "FROM Person AS p WHERE p.id = :id AND user_id = :userId";
 
-	public Person findByUserId(final int userId, final int id) throws SQLException {
+	public Person findByUserId(final User user, final int id) throws SQLException {
 		try {
 			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
 			final Query query = HibernateSessionFactoryUtil.getSessionFactory().createQuery(FIND_BY_USER_ID_HQL);
 			query.setParameter("id", id);
-			query.setParameter("userId", userId);
+			query.setParameter("userId", user.getId());
 			query.executeUpdate();
 			final Person person = HibernateSessionFactoryUtil.getSessionFactory().get(Person.class, id);
 			return person;

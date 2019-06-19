@@ -28,7 +28,7 @@ public class LoginCommand implements Command {
 		if (user != null) {
 			if (BCrypt.checkpw(loginPassword, user.getPassword())) {
 				System.out.println("User and password is correct!");
-				environment.setUserId(user.getId());
+				environment.setUser(user);
 
 				return true;
 			} else {

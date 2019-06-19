@@ -31,8 +31,6 @@ public class EmailSendingCommand implements Command {
 		System.out.println("Enter email of reciver");
 		final String inputEmail = scan.nextLine();
 
-		final int loginedUserId = environment.getUserId();
-		
 		final String emailValidationPattern = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)"
 				+ "*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
 
@@ -44,9 +42,9 @@ public class EmailSendingCommand implements Command {
 			Person p = null;
 
 			if (id == 000) {
-				persons = environment.getPersonRepository().showAll(loginedUserId);
+				persons = environment.getPersonRepository().showAll(environment.getUser());
 			} else {
-				p = environment.getPersonRepository().findByUserId(loginedUserId, id);
+				p = environment.getPersonRepository().findByUserId(environment.getUser(), id);
 			}
 
 			Mailer mailer = MailerBuilder

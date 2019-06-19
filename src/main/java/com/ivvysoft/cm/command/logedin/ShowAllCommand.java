@@ -13,14 +13,12 @@ public class ShowAllCommand implements Command {
 
 	private final Environment environment;
 
-
 	public ShowAllCommand(final Environment environment) {
 		this.environment = environment;
 	}
 
 	public boolean execute(final Scanner scan) throws SQLException {
-		final int loginedUserId = environment.getUserId();
-		List<Person> persons = environment.getPersonRepository().showAll(loginedUserId);
+		List<Person> persons = environment.getPersonRepository().showAll(environment.getUser());
 
 		System.out.println(PersonUtils.personsToString(persons));
 		System.out.println("You have " + persons.size() + " persons in your list");

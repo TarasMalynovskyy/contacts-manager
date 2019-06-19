@@ -33,9 +33,9 @@ public class AppStart {
 				final int commandPositionAnonim = Integer.parseInt(scan.nextLine());
 				final boolean permissionCheck = invokerAnonim.execute(commandPositionAnonim, scan);
 
-				if (permissionCheck && environment.getUserId() != 0) {
+				if (permissionCheck && environment.getUser().getId() != 0) {
 					loginedUser();
-				} else if (permissionCheck && environment.getUserId() == 0) {
+				} else if (permissionCheck && environment.getUser().getId() == 0) {
 					//
 				} else {
 					HibernateSessionFactoryUtil.factoryClose();

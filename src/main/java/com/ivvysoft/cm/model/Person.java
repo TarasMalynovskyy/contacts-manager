@@ -19,9 +19,6 @@ public class Person {
 	@Column(name = "id")
 	private int id;
 
-	@Column(name = "user_id")
-	private int userId;
-
 	@Column(name = "first_name")
 	private String firstName;
 
@@ -35,19 +32,19 @@ public class Person {
 	private String email;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "userId")
+	@JoinColumn(name = "user_id")
 	private User user;
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
 
 	public Person() {
 
-	}
-
-	public int getUserId() {
-		return userId;
-	}
-
-	public void setUserId(int userId) {
-		this.userId = userId;
 	}
 
 	public int getId() {
