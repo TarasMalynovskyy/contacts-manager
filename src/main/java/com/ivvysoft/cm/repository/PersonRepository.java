@@ -53,13 +53,14 @@ public class PersonRepository {
 		try {
 			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
 			HibernateSessionFactoryUtil.getSessionFactory().save(person);
+			HibernateSessionFactoryUtil.getSessionFactory().getTransaction().commit();
 		} finally {
 			HibernateSessionFactoryUtil.closeCurrentSession();
 		}
 	}
 
 	private final String DELETE_HQL = "DELETE FROM Person AS p WHERE p.id = :id AND user_id = :userId";
-
+	
 	public void delete(final User user, final int id) throws SQLException {
 		try {
 			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
@@ -107,6 +108,7 @@ public class PersonRepository {
 			query.setParameter("userId", user.getId());
 			query.executeUpdate();
 			final Person person = HibernateSessionFactoryUtil.getSessionFactory().get(Person.class, id);
+			
 			return person;
 		} finally {
 			HibernateSessionFactoryUtil.closeCurrentSession();
