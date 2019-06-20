@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Scanner;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.mindrot.jbcrypt.BCrypt;
 
 import com.ivvysoft.cm.Environment;
@@ -44,7 +45,7 @@ public class RegistrationCommand implements Command {
 				System.out.println("---New user was created!---");
 				
 				return true;
-			} catch (SQLIntegrityConstraintViolationException e) {
+			} catch (ConstraintViolationException | SQLIntegrityConstraintViolationException e) {
 				System.out.println();
 				System.out.println("User name already exist, please try another!");
 				System.out.println();

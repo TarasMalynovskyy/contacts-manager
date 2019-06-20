@@ -21,7 +21,7 @@ public class HibernateSessionFactoryUtil {
 	public static Session getSessionFactory() {
 		if (session == null || !session.isConnected()) {
 			try {
-				session = factory.getCurrentSession();
+				session = factory.openSession();
 			} catch (Exception e) {
 				System.out.println("Исключение!" + e);
 			}

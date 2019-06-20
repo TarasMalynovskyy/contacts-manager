@@ -1,18 +1,18 @@
 package com.ivvysoft.cm;
 
 import com.ivvysoft.cm.model.User;
-import com.ivvysoft.cm.repository.PersonRepository;
-import com.ivvysoft.cm.repository.UserRepository;
+import com.ivvysoft.cm.repository.PersonRepositoryImpl;
+import com.ivvysoft.cm.repository.UserRepositoryImpl;
 
 public class Environment {
 	
-	private PersonRepository personRepository = new PersonRepository();
-	private UserRepository userRepository = new UserRepository();
+	private PersonRepositoryImpl personRepository = new PersonRepositoryImpl();
+	private UserRepositoryImpl userRepository = new UserRepositoryImpl();
 	private User user = null;
 //	private int userId;
 	
 
-	public PersonRepository getPersonRepository() {
+	public PersonRepositoryImpl getPersonRepository() {
 		return personRepository;
 	}
 
@@ -24,15 +24,15 @@ public class Environment {
 		this.user = user;
 	}
 
-	public void setPersonRepository(PersonRepository personRepository) {
+	public void setPersonRepository(PersonRepositoryImpl personRepository) {
 		this.personRepository = personRepository;
 	}
 
-	public UserRepository getUserRepository() {
+	public UserRepositoryImpl getUserRepository() {
 		return userRepository;
 	}
 
-	public void setUserRepository(UserRepository userRepository) {
+	public void setUserRepository(UserRepositoryImpl userRepository) {
 		this.userRepository = userRepository;
 	}
 
