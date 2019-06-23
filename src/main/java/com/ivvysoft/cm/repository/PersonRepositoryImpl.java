@@ -3,9 +3,10 @@ package com.ivvysoft.cm.repository;
 import java.util.List;
 
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -15,7 +16,7 @@ import com.ivvysoft.cm.model.Person_;
 import com.ivvysoft.cm.model.User;
 import com.ivvysoft.cm.util.HibernateSessionFactoryUtil;
 
-public class PersonRepositoryImpl implements PersonRepository{
+public class PersonRepositoryImpl implements PersonRepository {
 
 	public Person findByFirstOrLastName(final User user, final String firstName, final String lastName) {
 		try {
@@ -58,10 +59,8 @@ public class PersonRepositoryImpl implements PersonRepository{
 			final Predicate userIdEquals = builder.equal(root.get(Person_.user), userIdParameter);
 
 			criteria.select(root).where(userIdEquals);
-			final List<Person> persons = HibernateSessionFactoryUtil.getSessionFactory()
-					.createQuery(criteria)
-						.setParameter(userIdParameter, user)
-							.getResultList();
+			final List<Person> persons = HibernateSessionFactoryUtil.getSessionFactory().createQuery(criteria)
+					.setParameter(userIdParameter, user).getResultList();
 
 			return persons;
 		} finally {
@@ -79,15 +78,23 @@ public class PersonRepositoryImpl implements PersonRepository{
 		}
 	}
 
-	private final String DELETE_HQL = "DELETE FROM Person AS p WHERE p.id = :id AND user_id = :userId";
-
 	public void delete(final User user, final int id) {
 		try {
 			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
-			final Query query = HibernateSessionFactoryUtil.getSessionFactory().createQuery(DELETE_HQL);
-			query.setParameter("id", id);
-			query.setParameter("userId", user.getId());
-			query.executeUpdate();
+
+			CriteriaBuilder builder = HibernateSessionFactoryUtil.getSessionFactory().getCriteriaBuilder();
+			CriteriaDelete<Person> criteriaDelete = builder.createCriteriaDelete(Person.class);
+			Root<Person> root = criteriaDelete.from(Person.class);
+
+			final ParameterExpression<User> userIdParameter = builder.parameter(User.class);
+			final ParameterExpression<Integer> personIdParameter = builder.parameter(Integer.class);
+			final Predicate userIdEquals = builder.equal(root.get(Person_.user), userIdParameter);
+			final Predicate personIdEquals = builder.equal(root.get(Person_.id), personIdParameter);
+			criteriaDelete.where(builder.and(personIdEquals), userIdEquals);
+
+			HibernateSessionFactoryUtil.getSessionFactory().createQuery(criteriaDelete)
+					.setParameter(userIdParameter, user).setParameter(personIdParameter, id).executeUpdate();
+
 			HibernateSessionFactoryUtil.getSessionFactory().getTransaction().commit();
 		} finally {
 			HibernateSessionFactoryUtil.closeCurrentSession();
@@ -97,8 +104,17 @@ public class PersonRepositoryImpl implements PersonRepository{
 	public Person edit(final Person person) {
 		try {
 			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
-			HibernateSessionFactoryUtil.getSessionFactory().update(person);
-			final Person p = HibernateSessionFactoryUtil.getSessionFactory().get(Person.class, person.getId());
+			CriteriaBuilder builder = HibernateSessionFactoryUtil.getSessionFactory().getCriteriaBuilder();
+			CriteriaUpdate<Person> criteriaUpdate = builder.createCriteriaUpdate(Person.class);
+			Root<Person> root = criteriaUpdate.from(Person.class);
+
+			final ParameterExpression<Person> personParameters = builder.parameter(Person.class);
+			final Predicate personEquals = builder.equal(root.as(Person_.class), personParameters);
+			criteriaUpdate.where(personEquals);
+
+			final Person p = (Person) HibernateSessionFactoryUtil.getSessionFactory().createQuery(criteriaUpdate)
+					.setParameter(personParameters, person).getSingleResult();
+			
 			HibernateSessionFactoryUtil.getSessionFactory().getTransaction().commit();
 
 			return p;
@@ -121,27 +137,24 @@ public class PersonRepositoryImpl implements PersonRepository{
 	public Person findByUserId(final User user, final int id) {
 		try {
 			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
-			
+
 			CriteriaBuilder builder = HibernateSessionFactoryUtil.getSessionFactory().getCriteriaBuilder();
 			CriteriaQuery<Person> criteria = builder.createQuery(Person.class);
 			Root<Person> root = criteria.from(Person.class);
-			
+
 			final ParameterExpression<Integer> personIdParameter = builder.parameter(Integer.class);
 			final ParameterExpression<User> userIdParameter = builder.parameter(User.class);
-			
+
 			final Predicate personIdEquals = builder.equal(root.get(Person_.id), personIdParameter);
 			final Predicate userIdEquals = builder.equal(root.get(Person_.user), userIdParameter);
-			
-			criteria.select(root).where(builder.and(personIdEquals),(userIdEquals));
-			
-			final Person person = HibernateSessionFactoryUtil.getSessionFactory()
-					.createQuery(criteria)
-						.setParameter(personIdParameter, id)
-						.setParameter(userIdParameter, user)
-							.getSingleResult();
+
+			criteria.select(root).where(builder.and(personIdEquals), (userIdEquals));
+
+			final Person person = HibernateSessionFactoryUtil.getSessionFactory().createQuery(criteria)
+					.setParameter(personIdParameter, id).setParameter(userIdParameter, user).getSingleResult();
 
 			return person;
-		}catch (NoResultException e) {
+		} catch (NoResultException e) {
 			return null;
 		} finally {
 			HibernateSessionFactoryUtil.closeCurrentSession();
