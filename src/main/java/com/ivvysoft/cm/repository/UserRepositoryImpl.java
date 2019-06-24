@@ -15,21 +15,23 @@ import com.ivvysoft.cm.util.HibernateSessionFactoryUtil;
 
 public class UserRepositoryImpl implements UserRepository {
 
+	@Override
 	public void create(final User user) throws SQLException {
 		try {
-			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
-			HibernateSessionFactoryUtil.getSessionFactory().save(user);
-			HibernateSessionFactoryUtil.getSessionFactory().getTransaction().commit();
+			HibernateSessionFactoryUtil.getSession().beginTransaction();
+			HibernateSessionFactoryUtil.getSession().save(user);
+			HibernateSessionFactoryUtil.getSession().getTransaction().commit();
 		} finally {
 			HibernateSessionFactoryUtil.closeCurrentSession();
 		}
 	}
 
+	@Override
 	public User findByUserName(final String userName) {
 		try {
-			HibernateSessionFactoryUtil.getSessionFactory().beginTransaction();
+			HibernateSessionFactoryUtil.getSession().beginTransaction();
 			
-			CriteriaBuilder builder = HibernateSessionFactoryUtil.getSessionFactory().getCriteriaBuilder();
+			CriteriaBuilder builder = HibernateSessionFactoryUtil.getSession().getCriteriaBuilder();
 			CriteriaQuery<User> criteria = builder.createQuery(User.class);
 			Root<User> root = criteria.from(User.class);
 
@@ -37,13 +39,11 @@ public class UserRepositoryImpl implements UserRepository {
 			final Predicate userNameEquals = builder.equal(root.get(User_.userName), userNameParameter);
 
 			criteria.select(root).where(userNameEquals);
-			final User user = HibernateSessionFactoryUtil.getSessionFactory()
-					.createQuery(criteria)
-						.setParameter(userNameParameter, userName)
-							.getSingleResult();
+			final User user = HibernateSessionFactoryUtil.getSession().createQuery(criteria)
+					.setParameter(userNameParameter, userName).getSingleResult();
 
-			HibernateSessionFactoryUtil.getSessionFactory().getTransaction().commit();
-
+			HibernateSessionFactoryUtil.getSession().getTransaction().commit();
+			
 			return user;
 		} catch (NoResultException e) {
 			return null;

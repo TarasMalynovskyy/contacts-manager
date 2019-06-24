@@ -4,6 +4,7 @@
         "http://hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
+  		
         <property name="hibernate.connection.driver_class">org.mariadb.jdbc.Driver</property>
         <property name="hibernate.connection.url">jdbc:mariadb://localhost:3306/contacts_manager</property>
         <property name="hibernate.connection.username">root</property>
@@ -11,7 +12,14 @@
         <property name="hibernate.connection.pool_size">1</property>
         <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.show_sql">true</property>
-        <property name="hibernate.dialect">org.hibernate.dialect.MariaDB103Dialect</property>
-        <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hbm2ddl.auto">update</property>
+        
+        
+        <property name="hibernate.hikari.connectionTimeout">20000</property>
+        <property name="hibernate.hikari.minimumIdle">10</property>
+        <property name="hibernate.hikari.maximumPoolSize">20</property>
+        <property name="hibernate.hikari.idleTimeout">300000</property>
+
     </session-factory>
 </hibernate-configuration>
